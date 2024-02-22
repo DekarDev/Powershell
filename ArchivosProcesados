@@ -1,0 +1,116 @@
+#Condicion para detectar y realizar acciones con documentos tipo .PDF y XLSX. y XLS.
+
+do {
+    # Definir la ruta base
+    $rutaBase = "D:\LACOSA\2.2024\1. DL"
+    # Ruta del archivo de texto para registrar las fechas de modificación de los archivos
+    $archivoRegistro = "D:\LACOSA\0.DS\R\Pruebas_Laboratorio.txt"
+
+    # Función para buscar archivos PDF y Excel en las subcarpetas de las carpetas principales y agregar prefijos si es necesario
+    function BuscarArchivosPDFyExcel($ruta, $registro) {
+        # Obtener las carpetas principales en la ruta especificada
+        $carpetasPrincipales = Get-ChildItem -Path $ruta -Directory
+
+        # Iterar sobre cada carpeta principal
+        foreach ($carpetaPrincipal in $carpetasPrincipales) {
+            # Obtener las subcarpetas de la carpeta principal
+            $subcarpetas = Get-ChildItem -Path $carpetaPrincipal.FullName -Directory
+
+            # Iterar sobre cada subcarpeta y buscar archivos PDF y Excel
+            foreach ($subcarpeta in $subcarpetas) {
+                # Obtener el prefijo de la subcarpeta (los dígitos decimales del nombre con puntos decimales)
+                $prefijo = $subcarpeta.Name -replace '[^\d\.]', ''
+
+                # Obtener archivos PDF y Excel en la subcarpeta actual
+                $archivosPDF = Get-ChildItem -Path $subcarpeta.FullName -File -Filter "*.pdf"
+                $archivosExcel = Get-ChildItem -Path $subcarpeta.FullName -File | Where-Object { $_.Extension -eq '.xlsx' -or $_.Extension -eq '.xls' }
+
+                $prefijoE = "$prefijo" + "E"
+                $prefijoR = "$prefijo" + "R"
+
+                # Agregar prefijo a los archivos PDF que no lo tienen
+                foreach ($archivoPDF in $archivosPDF) {
+                    $nuevoNombre = "$prefijoE $($archivoPDF.BaseName)$($archivoPDF.Extension)"
+                    if (-not $archivoPDF.Name.StartsWith($prefijoE)) {
+                        $nuevoNombre = "$prefijoE $($archivoPDF.BaseName)$($archivoPDF.Extension)"
+                        Rename-ItemWithDuplicateHandling -SourcePath $archivoPDF.FullName -DestinationPath $nuevoNombre -Prefix $prefijoE -Registro $registro
+                    }
+                    else {
+                       
+                    }
+                }
+
+                # Agregar prefijo a los archivos Excel que no lo tienen
+                foreach ($archivoExcel in $archivosExcel) {
+                    $nuevoNombre = "$prefijoR $($archivoExcel.BaseName)$($archivoExcel.Extension)"
+                    if (-not $archivoExcel.Name.StartsWith($prefijoR)) {
+                        $nuevoNombre = "$prefijoR $($archivoExcel.BaseName)$($archivoExcel.Extension)"
+                        Rename-ItemWithDuplicateHandling -SourcePath $archivoExcel.FullName -DestinationPath $nuevoNombre -Prefix $prefijoR -Registro $registro
+                    }
+                    else {
+                        
+                    }
+                }
+            }
+        }
+    }
+
+    # Función para renombrar archivos con manejo de duplicados
+    function Rename-ItemWithDuplicateHandling {
+        param (
+            [string]$SourcePath,
+            [string]$DestinationPath,
+            [string]$Prefix,
+            [string]$Registro
+        )
+
+        if (Test-Path $DestinationPath) {
+            $count = 1
+            $newDestinationPath = $DestinationPath
+            while (Test-Path $newDestinationPath) {
+                $count++
+                $fileName = [System.IO.Path]::GetFileNameWithoutExtension($DestinationPath)
+                $extension = [System.IO.Path]::GetExtension($DestinationPath)
+                $newFileName = "$fileName-$count$extension"
+                $newDestinationPath = Join-Path -Path (Split-Path $DestinationPath) -ChildPath $newFileName
+            }
+            $DestinationPath = $newDestinationPath
+        }
+
+        try {
+            Rename-Item -Path $SourcePath -NewName $DestinationPath -ErrorAction Stop
+           
+            # Write additional information about the modified file to the log file
+            $dateModified = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+            $logEntry = "Fecha y Hora: $dateModified - Archivo modificado: $(Split-Path $DestinationPath -Leaf)"
+            Add-Content -Path $Registro -Value $logEntry
+        } catch {
+        }
+    }
+
+    # Llamar a la función para buscar archivos PDF y Excel y agregar prefijos si es necesario
+    BuscarArchivosPDFyExcel $rutaBase $archivoRegistro
+
+    # Esperar 10 segundos antes de ejecutar nuevamente
+    Start-Sleep -Seconds 2
+} while ($true)
+
+
+
+
+#Logica
+#Inicio: El programa comienza aquí.
+#Definir ruta base y ruta del archivo de registro: Se establecen las ubicaciones de las carpetas y archivos necesarios para el funcionamiento del programa.
+#Definir función BuscarArchivosPDFyExcel: Se crea una función para buscar archivos PDF y Excel en las subcarpetas de las carpetas principales.
+#Definir función Rename-ItemWithDuplicateHandling: Se define una función para manejar el renombramiento de archivos con manejo de duplicados.
+#Iniciar bucle infinito: Se inicia un bucle que se ejecutará continuamente.
+#Obtener las carpetas principales en la ruta base: Se recorren las carpetas principales en la ruta especificada.
+#Para cada carpeta principal: Se repite el proceso para cada carpeta encontrada.
+#Obtener las subcarpetas de la carpeta principal: Se exploran las subcarpetas dentro de la carpeta principal.
+#Para cada subcarpeta: Se realiza un análisis detallado de cada subcarpeta.
+#Obtener el prefijo de la subcarpeta: Se identifica el prefijo numérico de la subcarpeta.
+#Obtener archivos PDF y Excel en la subcarpeta: Se buscan archivos PDF y Excel dentro de la subcarpeta.
+#Para cada archivo PDF: Se verifica y se renombra si es necesario.
+#Para cada archivo Excel: Se verifica y se renombra si es necesario.
+#Esperar 2 segundos antes de la próxima iteración: Se espera un breve período antes de continuar con la siguiente iteración del bucle.
+#Fin del bucle infinito: Se marca el final del bucle, aunque en la práctica el programa seguirá ejecutándose en un ciclo continuo.
