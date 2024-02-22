@@ -1,0 +1,80 @@
+#IMPRESIONES MASIVAS DE DOCUMENTOS Y LIMPIEZA DEL AREA DE IMPRESION
+# Función para imprimir archivos PDF en la impresora predeterminada
+function ImprimirPDF {
+    param (
+        [string]$carpeta
+    )
+
+    # Obtiene la lista de archivos PDF en la carpeta especificada
+    $archivosPDF = Get-ChildItem -Path $carpeta -Filter *.pdf
+
+    # Obtiene la impresora predeterminada
+    $defaultPrinter = Get-WmiObject -Query "SELECT * FROM Win32_Printer WHERE Default=$true"
+
+    # Imprime cada archivo PDF en la impresora predeterminada
+    foreach ($archivo in $archivosPDF) {
+        Start-Process -FilePath $archivo.FullName -Verb Print -ArgumentList $defaultPrinter.Name
+    }
+}
+
+# Función para borrar archivos PDF impresos
+function BorrarArchivosImpresos {
+    param (
+        [string]$carpeta
+    )
+
+    # Obtiene la lista de archivos PDF en la carpeta especificada
+    $archivosPDF = Get-ChildItem -Path $carpeta -Filter *.pdf
+
+    # Borra cada archivo PDF
+    foreach ($archivo in $archivosPDF) {
+        Remove-Item -Path $archivo.FullName -Force
+    }
+}
+
+# Función para agregar permisos de ejecución a un script
+function AgregarPermisosEjecucion {
+    param (
+        [string]$scriptPath
+    )
+
+    # Agrega permisos de ejecución al script
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+}
+
+# Función para restaurar los permisos de ejecución a su estado original
+function RestaurarPermisosEjecucion {
+    # Restaura los permisos de ejecución al estado original
+    Set-ExecutionPolicy -ExecutionPolicy Restricted -Scope Process
+}
+
+# Función para mostrar un contador antes de borrar los archivos PDF
+function MostrarContador {
+    param (
+        [int]$segundos
+    )
+
+    Write-Host "Tu trabajo se está imprimiendo..."
+    for ($i = $segundos; $i -ge 0; $i--) {
+        Write-Host $i
+        Start-Sleep -Seconds 1
+    }
+}
+
+# Carpeta donde se encuentran los archivos PDF
+$carpetaPDF = "\\SERVERLACOSA\2-Traspasos TEMP\18-Soporte\IM18"
+
+# Agregar permisos de ejecución antes de comenzar
+AgregarPermisosEjecucion
+
+# Imprimir archivos PDF en la impresora predeterminada
+ImprimirPDF -carpeta $carpetaPDF
+
+# Mostrar contador antes de borrar archivos impresos
+MostrarContador -segundos 5
+
+# Borrar archivos PDF impresos
+BorrarArchivosImpresos -carpeta $carpetaPDF
+
+# Restaurar permisos de ejecución al finalizar
+RestaurarPermisosEjecucion
