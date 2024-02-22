@@ -78,3 +78,42 @@ BorrarArchivosImpresos -carpeta $carpetaPDF
 
 # Restaurar permisos de ejecución al finalizar
 RestaurarPermisosEjecucion
+
+
+
+#Impresión Masiva de Documentos y Limpieza del Área de Impresión:
+
+#Este script se encarga de imprimir archivos PDF ubicados en una carpeta específica en una impresora predeterminada y luego limpiar la carpeta de los archivos impresos.
+Funciones:
+
+#ImprimirPDF:
+#Esta función recibe como parámetro una ruta de carpeta.
+#Obtiene una lista de archivos PDF en la carpeta especificada.
+#Identifica la impresora predeterminada del sistema.
+#Itera sobre cada archivo PDF encontrado e inicia un proceso de impresión en la impresora predeterminada.
+#BorrarArchivosImpresos:
+#Esta función recibe como parámetro una ruta de carpeta.
+#Obtiene una lista de archivos PDF en la carpeta especificada.
+#Itera sobre cada archivo PDF encontrado y lo elimina de la carpeta.
+#AgregarPermisosEjecucion:
+#Esta función recibe como parámetro la ruta de un script.
+#Configura la política de ejecución del sistema para permitir la ejecución del script especificado.
+#RestaurarPermisosEjecucion:
+#Esta función no recibe parámetros.
+#Restaura la política de ejecución del sistema a su estado original.
+#MostrarContador:
+#Esta función recibe como parámetro la cantidad de segundos.
+#Muestra un contador en la consola que cuenta hacia atrás desde el número de segundos especificado.
+#Variables:
+#$carpetaPDF: Almacena la ruta de la carpeta donde se encuentran los archivos PDF a imprimir y limpiar.
+#Acciones Principales:
+#Agregar Permisos de Ejecución:
+#Antes de comenzar, el script agrega permisos de ejecución para garantizar que pueda realizar las operaciones requeridas.
+#Imprimir Archivos PDF:
+#Llama a la función ImprimirPDF para imprimir los archivos PDF en la impresora predeterminada.
+#Mostrar Contador:
+#Muestra un contador antes de borrar los archivos impresos para dar tiempo al proceso de impresión.
+#Borrar Archivos Impresos:
+#Llama a la función BorrarArchivosImpresos para limpiar la carpeta de los archivos PDF impresos.
+#Restaurar Permisos de Ejecución:
+#Al finalizar, el script restaura los permisos de ejecución a su estado original para mantener la seguridad del sistema.#
