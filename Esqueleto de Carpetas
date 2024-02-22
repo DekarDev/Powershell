@@ -187,5 +187,4 @@ while ($true) {
 #Si el archivo de texto no existe, se crea y se agrega contenido.
 #Se espera 2 segundos.
 #Fin del bucle para cada carpeta.
-#Fin del programa.(No alcanza, fin del programa unicamente forzado)
-
+#Fin del bucle infinito: Se marca el final del bucle, aunque en la práctica el programa seguirá ejecutándose en un ciclo continuo.
