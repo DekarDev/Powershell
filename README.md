@@ -162,7 +162,10 @@ while ($true) {
     Start-Sleep -Seconds 2
 }
 
-#En resumen hace esto
+
+
+
+#En resumen hace esto:
 #Se definen las rutas base y del archivo RCARPETAS.txt.
 #Se verifica si el archivo RCARPETAS.txt existe.
 #Si no existe, se crea.
