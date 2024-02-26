@@ -1,119 +1,74 @@
-#IMPRESIONES MASIVAS DE DOCUMENTOS Y LIMPIEZA DEL AREA DE IMPRESION
-# Función para imprimir archivos PDF en la impresora predeterminada
-function ImprimirPDF {
-    param (
-        [string]$carpeta
-    )
-
-    # Obtiene la lista de archivos PDF en la carpeta especificada
-    $archivosPDF = Get-ChildItem -Path $carpeta -Filter *.pdf
-
-    # Obtiene la impresora predeterminada
-    $defaultPrinter = Get-WmiObject -Query "SELECT * FROM Win32_Printer WHERE Default=$true"
-
-    # Imprime cada archivo PDF en la impresora predeterminada
-    foreach ($archivo in $archivosPDF) {
-        Start-Process -FilePath $archivo.FullName -Verb Print -ArgumentList $defaultPrinter.Name
+# Función para verificar si hay archivos PDF en la carpeta de impresión
+function VerificarArchivos {
+    $carpeta = "C:\Users\Usuario\Desktop\Pruebas de programacion\Impresion Masiva"
+    $archivos = Get-ChildItem -Path $carpeta -Filter *.pdf | Sort-Object { [int]$_.BaseName }
+    if ($archivos.Count -eq 0) {
+        Write-Host "No hay archivos PDF para imprimir."
+        return $false
+    } else {
+        Write-Host "Se han identificado $($archivos.Count) archivo(s) PDF para imprimir."
+        return $true
     }
 }
 
-# Función para borrar archivos PDF impresos
-function BorrarArchivosImpresos {
-    param (
-        [string]$carpeta
-    )
-
-    # Obtiene la lista de archivos PDF en la carpeta especificada
-    $archivosPDF = Get-ChildItem -Path $carpeta -Filter *.pdf
-
-    # Borra cada archivo PDF
-    foreach ($archivo in $archivosPDF) {
-        Remove-Item -Path $archivo.FullName -Force
+# Función para imprimir los archivos PDF en orden numérico
+function ImprimirArchivos {
+    $carpeta = "C:\Users\Usuario\Desktop\Pruebas de programacion\Impresion Masiva"
+    $archivos = Get-ChildItem -Path $carpeta -Filter *.pdf | Sort-Object { [int]$_.BaseName }
+    foreach ($archivo in $archivos) {
+        Start-Process -FilePath $archivo.FullName -Verb Print
+        Write-Host "Imprimiendo $($archivo.Name)"
+        Start-Sleep -Seconds 5
     }
 }
 
-# Función para agregar permisos de ejecución a un script
-function AgregarPermisosEjecucion {
-    param (
-        [string]$scriptPath
-    )
-
-    # Agrega permisos de ejecución al script
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+# Función para borrar los archivos después de imprimirlos
+function BorrarArchivos {
+    $carpeta = "C:\Users\Usuario\Desktop\Pruebas de programacion\Impresion Masiva"
+    Remove-Item -Path $carpeta\* -Force
+    Write-Host "Archivos PDF impresos borrados correctamente."
 }
 
-# Función para restaurar los permisos de ejecución a su estado original
-function RestaurarPermisosEjecucion {
-    # Restaura los permisos de ejecución al estado original
-    Set-ExecutionPolicy -ExecutionPolicy Restricted -Scope Process
-}
+# Función principal
+function ImprimirMasivo {
+    Write-Host "Bienvenido a IMasiva by Gerardo"
+    Write-Host "Presiona Enter para verificar si hay archivos PDF para imprimir..."
+    $null = Read-Host
 
-# Función para mostrar un contador antes de borrar los archivos PDF
-function MostrarContador {
-    param (
-        [int]$segundos
-    )
-
-    Write-Host "Tu trabajo se está imprimiendo..."
-    for ($i = $segundos; $i -ge 0; $i--) {
-        Write-Host $i
-        Start-Sleep -Seconds 1
+    if (VerificarArchivos) {
+        Write-Host "Presiona Enter para comenzar a imprimir los archivos PDF..."
+        $null = Read-Host
+        ImprimirArchivos
+        Write-Host "Presiona Enter para borrar los archivos PDF impresos..."
+        $null = Read-Host
+        BorrarArchivos
     }
+
+    Write-Host "Gracias por usar IMasiva by Gerardo"
 }
 
-# Carpeta donde se encuentran los archivos PDF
-$carpetaPDF = "\\SERVERLACOSA\2-Traspasos TEMP\18-Soporte\IM18"
-
-# Agregar permisos de ejecución antes de comenzar
-AgregarPermisosEjecucion
-
-# Imprimir archivos PDF en la impresora predeterminada
-ImprimirPDF -carpeta $carpetaPDF
-
-# Mostrar contador antes de borrar archivos impresos
-MostrarContador -segundos 5
-
-# Borrar archivos PDF impresos
-BorrarArchivosImpresos -carpeta $carpetaPDF
-
-# Restaurar permisos de ejecución al finalizar
-RestaurarPermisosEjecucion
+# Llamada a la función principal
+ImprimirMasivo
 
 
+#El programa comienza con la llamada a la función principal ImprimirMasivo.
+#Se muestra un mensaje de bienvenida al usuario.
+#Se solicita al usuario que presione Enter para verificar si hay archivos PDF para imprimir.
+#Se llama a la función VerificarArchivos.
+#Se busca archivos PDF en la carpeta especificada.
+#Si no se encuentra ningún archivo, se muestra un mensaje indicando que no hay archivos para imprimir.
+#Si se encuentran archivos, se muestra cuántos archivos PDF se han identificado para imprimir y se devuelve verdadero.
+#Si hay archivos PDF para imprimir:
+#Se solicita al usuario que presione Enter para comenzar a imprimir los archivos PDF.
+#Se llama a la función ImprimirArchivos.
+#Se obtienen y ordenan los archivos PDF en la carpeta especificada.
+#Se itera sobre cada archivo y se imprime utilizando el programa predeterminado de impresión.
+#Se muestra un mensaje indicando que se está imprimiendo el archivo.
+#Se espera 5 segundos entre cada impresión.
+#Se solicita al usuario que presione Enter para borrar los archivos PDF impresos.
+#Se llama a la función BorrarArchivos.
+#Se eliminan todos los archivos en la carpeta especificada después de que se hayan impreso correctamente.
+#Se muestra un mensaje indicando que los archivos PDF impresos han sido borrados correctamente.
+#Se muestra un mensaje de agradecimiento por usar el programa.
+#El programa termina.
 
-#Impresión Masiva de Documentos y Limpieza del Área de Impresión:
-
-#Este script se encarga de imprimir archivos PDF ubicados en una carpeta específica en una impresora predeterminada y luego limpiar la carpeta de los archivos impresos.
-Funciones:
-
-#ImprimirPDF:
-#Esta función recibe como parámetro una ruta de carpeta.
-#Obtiene una lista de archivos PDF en la carpeta especificada.
-#Identifica la impresora predeterminada del sistema.
-#Itera sobre cada archivo PDF encontrado e inicia un proceso de impresión en la impresora predeterminada.
-#BorrarArchivosImpresos:
-#Esta función recibe como parámetro una ruta de carpeta.
-#Obtiene una lista de archivos PDF en la carpeta especificada.
-#Itera sobre cada archivo PDF encontrado y lo elimina de la carpeta.
-#AgregarPermisosEjecucion:
-#Esta función recibe como parámetro la ruta de un script.
-#Configura la política de ejecución del sistema para permitir la ejecución del script especificado.
-#RestaurarPermisosEjecucion:
-#Esta función no recibe parámetros.
-#Restaura la política de ejecución del sistema a su estado original.
-#MostrarContador:
-#Esta función recibe como parámetro la cantidad de segundos.
-#Muestra un contador en la consola que cuenta hacia atrás desde el número de segundos especificado.
-#Variables:
-#$carpetaPDF: Almacena la ruta de la carpeta donde se encuentran los archivos PDF a imprimir y limpiar.
-#Acciones Principales:
-#Agregar Permisos de Ejecución:
-#Antes de comenzar, el script agrega permisos de ejecución para garantizar que pueda realizar las operaciones requeridas.
-#Imprimir Archivos PDF:
-#Llama a la función ImprimirPDF para imprimir los archivos PDF en la impresora predeterminada.
-#Mostrar Contador:
-#Muestra un contador antes de borrar los archivos impresos para dar tiempo al proceso de impresión.
-#Borrar Archivos Impresos:
-#Llama a la función BorrarArchivosImpresos para limpiar la carpeta de los archivos PDF impresos.
-#Restaurar Permisos de Ejecución:
-#Al finalizar, el script restaura los permisos de ejecución a su estado original para mantener la seguridad del sistema.#
