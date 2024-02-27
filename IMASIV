@@ -1,6 +1,6 @@
 # Función para verificar si hay archivos PDF en la carpeta de impresión
 function VerificarArchivos {
-    $carpeta = "C:\Users\Usuario\Desktop\Pruebas de programacion\Impresion Masiva"
+    $carpeta = "Direccion"
     $archivos = Get-ChildItem -Path $carpeta -Filter *.pdf | Sort-Object { [int]$_.BaseName }
     if ($archivos.Count -eq 0) {
         Write-Host "No hay archivos PDF para imprimir."
@@ -13,7 +13,7 @@ function VerificarArchivos {
 
 # Función para imprimir los archivos PDF en orden numérico
 function ImprimirArchivos {
-    $carpeta = "C:\Users\Usuario\Desktop\Pruebas de programacion\Impresion Masiva"
+    $carpeta = "Direccion"
     $archivos = Get-ChildItem -Path $carpeta -Filter *.pdf | Sort-Object { [int]$_.BaseName }
     foreach ($archivo in $archivos) {
         Start-Process -FilePath $archivo.FullName -Verb Print
@@ -24,7 +24,7 @@ function ImprimirArchivos {
 
 # Función para borrar los archivos después de imprimirlos
 function BorrarArchivos {
-    $carpeta = "C:\Users\Usuario\Desktop\Pruebas de programacion\Impresion Masiva"
+    $carpeta = "Direccion"
     Remove-Item -Path $carpeta\* -Force
     Write-Host "Archivos PDF impresos borrados correctamente."
 }
